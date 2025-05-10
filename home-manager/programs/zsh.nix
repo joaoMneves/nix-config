@@ -22,6 +22,7 @@
     shellGlobalAliases = {
       # Aliases globais (opcional)
       nv = "nvim .";
+      ".." = "cd ..";
     };
 
     sheldon = {
