@@ -1,4 +1,22 @@
 {
+  lib.my.importFolder = dir:
+    let
+      files = builtins.readDir dir;
+      nixFiles = lib.filterAttrs (name: type: type == "regular" && lib.strings.hasSuffix ".nix" name) files;
+    in
+    map (file: dir + "/${file}") (lib.attrNames nixFiles);
+}
+{
+  modules = [
+    ({ config, pkgs, ... }: {
+      nixpkgs.overlays = [
+        (final: prev: {
+          unstable = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux;
+        })
+      ];
+    })
+  ];
+
   description = "Minha Configuração NixOS";
 
   inputs = {

@@ -23,6 +23,8 @@
       # Aliases globais (opcional)
       nv = "nvim .";
       ".." = "cd ..";
+      update = "sudo nixos-rebuild switch --flake";
+
     };
 
     sheldon = {

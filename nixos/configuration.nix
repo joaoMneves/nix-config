@@ -30,7 +30,6 @@
 
   # Pacotes básicos
   environment.systemPackages = with pkgs; [
-    vim
     git
     wget
   ];
@@ -38,5 +37,13 @@
   # Serviços
   services.openssh.enable = true;
   networking.networkmanager.enable = true;
+  config.allowUnfree = true;
+
+  # Garbage Collector
+  gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
 }
 
