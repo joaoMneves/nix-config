@@ -30,17 +30,17 @@
 
   # Pacotes básicos
   environment.systemPackages = with pkgs; [
-    git
+    # git
     wget
   ];
 
   # Serviços
   services.openssh.enable = true;
   networking.networkmanager.enable = true;
-  config.allowUnfree = true;
+  nixpkgs.config.allowUnfree = true;
 
   # Garbage Collector
-  gc = {
+  nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 7d";

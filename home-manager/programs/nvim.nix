@@ -6,7 +6,7 @@
   };
 
   home.packages = [
-    pkgs.neovim
+    pkgs.unstable.neovim
   ];
 
   programs.neovim = {

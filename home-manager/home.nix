@@ -1,11 +1,24 @@
 { pkgs, ... }:
 
+let
+  importFolder = dir:
+    builtins.attrValues
+      (builtins.mapAttrs
+        (name: type:
+          if type == "regular" && builtins.match ".*\\.nix$" name != null
+          then import (dir + "/${name}")
+          else null
+        )
+        (builtins.readDir dir)
+      );
+in
+
 {
 
   imports = [
     # Importa todos os arquivos .nix de programs/ e services/
-    (lib.my.importFolder ./programs)
-    (lib.my.importFolder ./services)
+    (importFolder ./programs)
+    (importFolder ./services)
   ];
 
   home.username = "joao";
@@ -31,23 +44,17 @@
       userEmail = "joaomiguelneves2007@proton.me";
     };
 
-    bash = {
-      enable = true;
-      shellAliases = {
-        ll = "ls -l";
-        update = "sudo nixos-rebuild switch";
-      };
-    };
   };
 
   # Serviços do usuário (e.g., ssh-agent)
   # services = {
   #   ssh-agent.enable = true;
   # };
-
+nixpkgs = {
   config = {
     # Disable if you don't want unfree packages
     allowUnfree = true;
   };
+};
 
 }

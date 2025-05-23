@@ -1,59 +1,40 @@
 {
-  lib.my.importFolder = dir:
-    let
-      files = builtins.readDir dir;
-      nixFiles = lib.filterAttrs (name: type: type == "regular" && lib.strings.hasSuffix ".nix" name) files;
-    in
-    map (file: dir + "/${file}") (lib.attrNames nixFiles);
-}
-{
-  modules = [
-    ({ config, pkgs, ... }: {
-      nixpkgs.overlays = [
-        (final: prev: {
-          unstable = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux;
-        })
-      ];
-    })
-  ];
-
-  description = "Minha Configuração NixOS";
+  description = "NixOS Configuration for João";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11"; # Versão estável
-    # You can access packages and modules from different nixpkgs revs
-    # at the same time. Here's an working example:
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
-
-    # Home manager
     home-manager.url = "github:nix-community/home-manager/release-23.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... }@inputs: {
     nixosConfigurations = {
       joao-nix = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+          # Overlay para pacotes instáveis
+          ({ config, pkgs, ... }: {
+            nixpkgs.overlays = [
+              (final: prev: {
+                unstable = nixpkgs-unstable.legacyPackages.x86_64-linux;
+              })
+            ];
+          })
           ./nixos/configuration.nix
           home-manager.nixosModules.home-manager
         ];
       };
     };
-    # Standalone home-manager configuration entrypoint
-    # Available through 'home-manager --flake .#your-username@your-hostname'
+
     homeConfigurations = {
-      # FIXME replace with your username@hostname
       "joao@joao-nix" = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-        extraSpecialArgs = { inherit inputs outputs; };
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        extraSpecialArgs = { inherit inputs; };
         modules = [
-          # > Our main home-manager configuration file <
           ./home-manager/home.nix
         ];
       };
     };
-
   };
 }
